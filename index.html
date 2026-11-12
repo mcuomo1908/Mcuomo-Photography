@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Photography Portfolio</title>
+
+<style>
+:root {
+    --background: #111111;
+    --foreground: #f5f5f5;
+    --muted: #999999;
+    --accent: #c6a77b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+    text-align: center;
+    padding: 65px 20px 35px;
+}
+
+header h1 {
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 300;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+header p {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 3px;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    padding: 20px;
+}
+
+nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding-bottom: 7px;
+}
+
+nav button.active,
+nav button:hover {
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+}
+
+.gallery {
+    max-width: 1500px;
+    margin: 25px auto 70px;
+    padding: 0 25px;
+    columns: 3;
+    column-gap: 16px;
+}
+
+.photo {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    break-inside: avoid;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.photo:hover img {
+    transform: scale(1.025);
+    opacity: 0.85;
+}
+
+.photo.hidden {
+    display: none;
+}
+
+footer {
+    text-align: center;
+    padding: 35px 20px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+/* Image viewer */
+
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    align-items: center;
+    justify-content: center;
+    padding: 55px 20px;
+}
+
+.lightbox.open {
+    display: flex;
+}
+
+.lightbox img {
+    max-width: 95%;
+    max-height: 85vh;
+    object-fit: contain;
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 38px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+@media (max-width: 900px) {
+    .gallery {
+        columns: 2;
+    }
+}
+
+@media (max-width: 550px) {
+    .gallery {
+        columns: 1;
+        padding: 0 12px;
+    }
+
+    header {
+        padding-top: 45px;
+    }
+
+    nav {
+        gap: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>YOUR NAME</h1>
+    <p>PHOTOGRAPHY PORTFOLIO</p>
+</header>
+
+<nav id="filters">
+    <button class="active" data-category="all">All Work</button>
+    <button data-category="landscape">Landscape</button>
+    <button data-category="nature">Nature</button>
+    <button data-category="street">Street</button>
+    <button data-category="portraits">Portraits</button>
+</nav>
+
+<main class="gallery" id="gallery"></main>
+
+<footer>
+    © 2026 YOUR NAME · ALL RIGHTS RESERVED
+</footer>
+
+<div class="lightbox" id="lightbox">
+    <button class="close" id="closeButton" aria-label="Close">&times;</button>
+    <img id="lightboxImage" src="" alt="Enlarged photograph">
+</div>
+
+<script>
+
+// =====================================
+// ADD YOUR PHOTOGRAPHS HERE
+// =====================================
+
+const photos = [
+    {
+        src: "images/photo1.jpg",
+        category: "landscape",
+        alt: "Mountain landscape"
+    },
+    {
+        src: "images/photo2.jpg",
+        category: "nature",
+        alt: "Nature photography"
+    },
+    {
+        src: "images/photo3.jpg",
+        category: "street",
+        alt: "Street photography"
+    },
+    {
+        src: "images/photo4.jpg",
+        category: "portraits",
+        alt: "Portrait photography"
+    },
+
+    // ADD MORE PHOTOS BELOW
+    // {
+    //     src: "images/my-new-photo.png",
+    //     category: "nature",
+    //     alt: "My new photograph"
+    // },
+
+];
+
+// =====================================
+// BUILD THE GALLERY
+// =====================================
+
+const gallery = document.getElementById("gallery");
+
+function displayPhotos(category = "all") {
+    gallery.innerHTML = "";
+
+    const filtered = photos.filter(photo =>
+        category === "all" || photo.category === category
+    );
+
+    filtered.forEach(photo => {
+        const item = document.createElement("div");
+        item.className = "photo";
+
+        const img = document.createElement("img");
+        img.src = photo.src;
+        img.alt = photo.alt || "Photography";
+        img.loading = "lazy";
+
+        img.onerror = () => {
+            item.remove();
+            console.warn("Could not load image:", photo.src);
+        };
+
+        item.appendChild(img);
+
+        item.addEventListener("click", () => {
+            openLightbox(photo.src, photo.alt);
+        });
+
+        gallery.appendChild(item);
+    });
+}
+
+// =====================================
+// CATEGORY FILTERS
+// =====================================
+
+document.querySelectorAll("#filters button").forEach(button => {
+    button.addEventListener("click", () => {
+
+        document.querySelectorAll("#filters button")
+            .forEach(btn => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+        displayPhotos(button.dataset.category);
+    });
+});
+
+// =====================================
+// IMAGE VIEWER
+// =====================================
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImage = document.getElementById("lightboxImage");
+
+function openLightbox(src, alt) {
+    lightboxImage.src = src;
+    lightboxImage.alt = alt || "Photography";
+    lightbox.classList.add("open");
+}
+
+function closeLightbox() {
+    lightbox.classList.remove("open");
+    lightboxImage.src = "";
+}
+
+document.getElementById("closeButton")
+    .addEventListener("click", closeLightbox);
+
+lightbox.addEventListener("click", event => {
+    if (event.target === lightbox) {
+        closeLightbox();
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeLightbox();
+    }
+});
+
+// Initial gallery
+displayPhotos();
+
+</script>
+
+</body>
+</html>
