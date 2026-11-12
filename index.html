@@ -66,7 +66,6 @@ nav a {
     letter-spacing: 2px;
     text-transform: uppercase;
     padding-bottom: 8px;
-    cursor: pointer;
 }
 
 nav a:hover,
@@ -75,7 +74,7 @@ nav a.active {
     border-bottom: 1px solid var(--accent);
 }
 
-/* PAGE CONTENT */
+/* PAGES */
 
 .page {
     display: none;
@@ -100,8 +99,8 @@ nav a.active {
     width: 100%;
     margin-bottom: 16px;
     break-inside: avoid;
-    cursor: pointer;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .photo img {
@@ -116,34 +115,7 @@ nav a.active {
     opacity: 0.85;
 }
 
-/* FILTERS */
-
-.filters {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 25px;
-    padding: 25px 15px 0;
-}
-
-.filters button {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding-bottom: 7px;
-}
-
-.filters button.active,
-.filters button:hover {
-    color: var(--accent);
-    border-bottom: 1px solid var(--accent);
-}
-
-/* ABOUT PAGE */
+/* ABOUT ME */
 
 .about-container {
     max-width: 850px;
@@ -183,13 +155,15 @@ nav a.active {
     color: #cccccc;
     border-bottom: 1px solid #292929;
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 1.8;
 }
 
 .equipment strong {
     color: white;
     font-weight: 500;
 }
+
+/* CONTACT */
 
 .contact {
     margin-top: 40px;
@@ -221,7 +195,7 @@ footer {
     border-top: 1px solid #292929;
 }
 
-/* LIGHTBOX */
+/* IMAGE VIEWER */
 
 .lightbox {
     display: none;
@@ -255,6 +229,8 @@ footer {
     border: none;
 }
 
+/* RESPONSIVE DESIGN */
+
 @media (max-width: 900px) {
     .gallery {
         columns: 2;
@@ -284,6 +260,8 @@ footer {
 
 <body>
 
+<!-- HEADER -->
+
 <header>
     <h1>Michael H. Cuomo</h1>
     <p>PHOTOGRAPHY PORTFOLIO</p>
@@ -305,15 +283,8 @@ footer {
 
 <section id="gallery" class="page active">
 
-    <div class="filters" id="filters">
-        <button class="active" data-category="all">All Work</button>
-        <button data-category="landscape">Landscape</button>
-        <button data-category="nature">Nature</button>
-        <button data-category="street">Street</button>
-        <button data-category="portraits">Portraits</button>
-    </div>
-
-    <main class="gallery" id="photoGallery"></main>
+    <main class="gallery" id="photoGallery">
+    </main>
 
 </section>
 
@@ -368,9 +339,11 @@ footer {
 
             <p>
                 Instagram:
-                <a href="https://www.instagram.com/michael.cuomo/"
-                   target="_blank"
-                   rel="noopener noreferrer">
+                <a
+                    href="https://www.instagram.com/michael.cuomo/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     @michael.cuomo
                 </a>
             </p>
@@ -381,17 +354,30 @@ footer {
 
 </section>
 
+<!-- FOOTER -->
+
 <footer>
     © 2026 MICHAEL H. CUOMO · ALL RIGHTS RESERVED
 </footer>
 
-<!-- PHOTO VIEWER -->
+<!-- IMAGE VIEWER -->
 
 <div class="lightbox" id="lightbox">
-    <button class="close" id="closeButton"
-            aria-label="Close">&times;</button>
 
-    <img id="lightboxImage" src="" alt="Enlarged photograph">
+    <button
+        class="close"
+        id="closeButton"
+        aria-label="Close"
+    >
+        &times;
+    </button>
+
+    <img
+        id="lightboxImage"
+        src=""
+        alt="Enlarged photograph"
+    >
+
 </div>
 
 <script>
@@ -400,57 +386,51 @@ footer {
 // ADD YOUR PHOTOGRAPHS HERE
 // =====================================
 
+// Put your photographs inside the images folder.
+// Add each new photograph to this list.
+
 const photos = [
 
     {
         src: "images/photo1.jpg",
-        category: "landscape",
-        alt: "Landscape photograph"
+        alt: "Photography by Michael H. Cuomo"
     },
 
     {
         src: "images/photo2.jpg",
-        category: "nature",
-        alt: "Nature photograph"
+        alt: "Photography by Michael H. Cuomo"
     },
 
     {
         src: "images/photo3.jpg",
-        category: "street",
-        alt: "Street photograph"
+        alt: "Photography by Michael H. Cuomo"
     },
 
     {
         src: "images/photo4.jpg",
-        category: "portraits",
-        alt: "Portrait photograph"
+        alt: "Photography by Michael H. Cuomo"
     },
 
-    // ADD YOUR OWN PHOTOGRAPHS BELOW
+    // ADD MORE PHOTOGRAPHS BELOW
 
     // {
-    //     src: "images/my-photo.jpg",
-    //     category: "landscape",
-    //     alt: "My photograph"
+    //     src: "images/my-new-photo.jpg",
+    //     alt: "My new photograph"
     // },
 
 ];
 
 // =====================================
-// GALLERY DISPLAY
+// DISPLAY ALL PHOTOGRAPHS
 // =====================================
 
 const gallery = document.getElementById("photoGallery");
 
-function displayPhotos(category = "all") {
+function displayPhotos() {
 
     gallery.innerHTML = "";
 
-    const filtered = photos.filter(photo =>
-        category === "all" || photo.category === category
-    );
-
-    filtered.forEach(photo => {
+    photos.forEach(photo => {
 
         const item = document.createElement("div");
         item.className = "photo";
@@ -479,25 +459,6 @@ function displayPhotos(category = "all") {
 }
 
 // =====================================
-// CATEGORY FILTERS
-// =====================================
-
-document.querySelectorAll("#filters button").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        document.querySelectorAll("#filters button")
-            .forEach(btn => btn.classList.remove("active"));
-
-        button.classList.add("active");
-
-        displayPhotos(button.dataset.category);
-
-    });
-
-});
-
-// =====================================
 // PAGE NAVIGATION
 // =====================================
 
@@ -517,8 +478,6 @@ function showPage(pageName) {
         'nav a[data-page="' + pageName + '"]'
     ).classList.add("active");
 
-    window.location.hash = pageName;
-
     window.scrollTo(0, 0);
 
 }
@@ -529,13 +488,18 @@ document.querySelectorAll("nav a").forEach(link => {
 
         event.preventDefault();
 
-        showPage(link.dataset.page);
+        const pageName = link.dataset.page;
+
+        history.pushState(null, "", "#" + pageName);
+
+        showPage(pageName);
 
     });
 
 });
 
-// Support direct links and browser navigation
+// Handle browser back and forward buttons
+
 function loadPageFromHash() {
 
     const page = window.location.hash.replace("#", "");
@@ -548,10 +512,10 @@ function loadPageFromHash() {
 
 }
 
-window.addEventListener("hashchange", loadPageFromHash);
+window.addEventListener("popstate", loadPageFromHash);
 
 // =====================================
-// LIGHTBOX
+// IMAGE VIEWER
 // =====================================
 
 const lightbox = document.getElementById("lightbox");
@@ -592,7 +556,9 @@ document.addEventListener("keydown", event => {
 
 });
 
-// INITIALIZE
+// =====================================
+// INITIALIZE WEBSITE
+// =====================================
 
 displayPhotos();
 loadPageFromHash();
