@@ -138,8 +138,6 @@ nav a.active {
     gap: 45px;
 }
 
-/* ABOUT PHOTO ON LEFT */
-
 .about-photo {
     flex: 0 0 40%;
     max-width: 40%;
@@ -166,7 +164,7 @@ nav a.active {
     line-height: 1.8;
 }
 
-/* ABOUT TEXT ON RIGHT */
+/* ABOUT TEXT */
 
 .about-content {
     flex: 1;
@@ -351,14 +349,10 @@ footer {
 
 <body>
 
-<!-- HEADER -->
-
 <header>
     <h1>Michael H. Cuomo</h1>
     <p>PHOTOGRAPHY PORTFOLIO</p>
 </header>
-
-<!-- NAVIGATION -->
 
 <nav>
     <a href="#gallery" class="active" data-page="gallery">
@@ -370,8 +364,6 @@ footer {
     </a>
 </nav>
 
-<!-- GALLERY PAGE -->
-
 <section id="gallery" class="page active">
 
     <main class="gallery" id="photoGallery">
@@ -382,15 +374,11 @@ footer {
 
 </section>
 
-<!-- ABOUT ME PAGE -->
-
 <section id="about" class="page">
 
     <div class="about-container">
 
         <div class="about-layout">
-
-            <!-- YOUR PHOTO ON THE LEFT -->
 
             <div class="about-photo">
 
@@ -412,8 +400,6 @@ footer {
                 </div>
 
             </div>
-
-            <!-- YOUR INFORMATION ON THE RIGHT -->
 
             <div class="about-content">
 
@@ -481,13 +467,9 @@ footer {
 
 </section>
 
-<!-- FOOTER -->
-
 <footer>
     © 2026 MICHAEL H. CUOMO · ALL RIGHTS RESERVED
 </footer>
-
-<!-- PHOTO VIEWER -->
 
 <div class="lightbox" id="lightbox">
 
@@ -513,13 +495,9 @@ footer {
 // GITHUB CONFIGURATION
 // ==========================================
 
-// CHANGE THESE TWO VALUES!
-
 const GITHUB_USERNAME = "mcuomo1908";
 
-const GITHUB_REPOSITORY = "Mcuomo-Photoprahy";
-
-// Folder containing your photographs
+const GITHUB_REPOSITORY = "Mcuomo-Photography";
 
 const IMAGE_FOLDER = "images";
 
@@ -532,8 +510,6 @@ const gallery = document.getElementById("photoGallery");
 async function loadPhotos() {
 
     gallery.innerHTML = "";
-
-    // Public GitHub repository API
 
     const apiURL =
         `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPOSITORY}/contents/${IMAGE_FOLDER}`;
@@ -549,9 +525,6 @@ async function loadPhotos() {
         }
 
         const files = await response.json();
-
-        // Find JPEG, JPG and PNG files.
-        // Exclude the About Me photograph.
 
         const imageFiles = files.filter(file => {
 
@@ -571,8 +544,6 @@ async function loadPhotos() {
 
         });
 
-        // Sort filenames alphabetically
-
         imageFiles.sort((a, b) =>
             a.name.localeCompare(b.name)
         );
@@ -590,8 +561,6 @@ async function loadPhotos() {
             return;
 
         }
-
-        // Create gallery images automatically
 
         imageFiles.forEach(file => {
 
