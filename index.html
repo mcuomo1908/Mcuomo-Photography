@@ -116,6 +116,29 @@ nav a.active {
     opacity: 0.85;
 }
 
+/* IMAGE LOAD ERROR PLACEHOLDER */
+
+.photo-error {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: var(--muted);
+    background: #242424;
+    border: 1px dashed #555;
+    text-align: center;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+.photo-error strong {
+    color: var(--accent);
+    font-weight: 400;
+}
+
 .gallery-message {
     columns: unset;
     text-align: center;
@@ -349,10 +372,14 @@ footer {
 
 <body>
 
+<!-- HEADER -->
+
 <header>
     <h1>Michael H. Cuomo</h1>
     <p>PHOTOGRAPHY PORTFOLIO</p>
 </header>
+
+<!-- NAVIGATION -->
 
 <nav>
     <a href="#gallery" class="active" data-page="gallery">
@@ -364,6 +391,8 @@ footer {
     </a>
 </nav>
 
+<!-- GALLERY PAGE -->
+
 <section id="gallery" class="page active">
 
     <main class="gallery" id="photoGallery">
@@ -373,6 +402,8 @@ footer {
     </main>
 
 </section>
+
+<!-- ABOUT ME PAGE -->
 
 <section id="about" class="page">
 
@@ -467,9 +498,13 @@ footer {
 
 </section>
 
+<!-- FOOTER -->
+
 <footer>
     © 2026 MICHAEL H. CUOMO · ALL RIGHTS RESERVED
 </footer>
+
+<!-- PHOTO VIEWER -->
 
 <div class="lightbox" id="lightbox">
 
@@ -496,9 +531,7 @@ footer {
 // ==========================================
 
 const GITHUB_USERNAME = "mcuomo1908";
-
 const GITHUB_REPOSITORY = "Mcuomo-Photography";
-
 const IMAGE_FOLDER = "images";
 
 // ==========================================
@@ -509,7 +542,9 @@ const gallery = document.getElementById("photoGallery");
 
 async function loadPhotos() {
 
-    gallery.innerHTML = "";
+    gallery.innerHTML = `
+        <div class="gallery-message">Loading photographs...</div>
+    `;
 
     const apiURL =
         `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPOSITORY}/contents/${IMAGE_FOLDER}`;
@@ -520,7 +555,7 @@ async function loadPhotos() {
 
         if (!response.ok) {
             throw new Error(
-                "Unable to access the GitHub images folder. Check your username, repository and folder."
+                `GitHub returned error ${response.status}. Check that the repository is public and the images folder exists.`
             );
         }
 
@@ -532,8 +567,7 @@ async function loadPhotos() {
 
             const name = file.name.toLowerCase();
 
-            const isImage =
-                /\.(jpg|jpeg|png)$/i.test(name);
+            const isImage = /\.(jpg|jpeg|png)$/i.test(name);
 
             const isAboutPhoto =
                 name === "about-me.jpg" ||
@@ -553,12 +587,30 @@ async function loadPhotos() {
             gallery.innerHTML = `
                 <div class="gallery-message">
                     No photographs found yet.<br>
-                    Upload JPG, JPEG or PNG files
-                    into your GitHub images folder.
+                    Upload JPG, JPEG or PNG files into your GitHub images folder.
                 </div>
             `;
 
             return;
+        }
+
+        gallery.innerHTML = "";
+
+        const status = document.createElement("div");
+        status.className = "gallery-message";
+        status.textContent =
+            `Found ${imageFiles.length} gallery photographs. Loading images...`;
+
+        gallery.appendChild(status);
+
+        let loadedCount = 0;
+        let failedCount = 0;
+
+        function updateGalleryStatus() {
+
+            status.textContent =
+                `${imageFiles.length} photographs found · ` +
+                `${loadedCount} loaded · ${failedCount} failed`;
 
         }
 
@@ -574,16 +626,43 @@ async function loadPhotos() {
             img.loading = "lazy";
             img.decoding = "async";
 
+            img.onload = () => {
+
+                loadedCount++;
+                updateGalleryStatus();
+
+            };
+
             img.onerror = () => {
-                item.remove();
-                console.warn("Could not load:", file.name);
+
+                failedCount++;
+
+                const errorCard = document.createElement("div");
+                errorCard.className = "photo-error";
+
+                const title = document.createElement("strong");
+                title.textContent = "Photograph could not load";
+
+                const filename = document.createElement("span");
+                filename.textContent = file.name;
+
+                errorCard.append(title, filename);
+
+                item.replaceChildren(errorCard);
+
+                updateGalleryStatus();
+
+                console.warn("Could not load photograph:", file.name);
+
             };
 
             item.appendChild(img);
 
             item.addEventListener("click", () => {
 
-                openLightbox(file.download_url, img.alt);
+                if (img.complete && img.naturalWidth > 0) {
+                    openLightbox(file.download_url, img.alt);
+                }
 
             });
 
@@ -595,21 +674,32 @@ async function loadPhotos() {
 
         console.error(error);
 
-        gallery.innerHTML = `
-            <div class="gallery-message">
-                <h3>Unable to load photographs</h3>
-                <p>${error.message}</p>
-                <p>
-                    Check the GitHub username,
-                    repository name and images folder.
-                </p>
-                <button onclick="loadPhotos()"
-                    style="margin-top:20px;padding:12px 20px;
-                    background:#c6a77b;border:0;cursor:pointer;">
-                    Try Again
-                </button>
-            </div>
-        `;
+        gallery.innerHTML = "";
+
+        const message = document.createElement("div");
+        message.className = "gallery-message";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "Unable to load photographs";
+
+        const detail = document.createElement("p");
+        detail.textContent = error.message;
+
+        const help = document.createElement("p");
+        help.textContent =
+            "Check the GitHub username, repository name, public access, and images folder.";
+
+        const retry = document.createElement("button");
+        retry.textContent = "Try Again";
+
+        retry.style.cssText =
+            "margin-top:20px;padding:12px 20px;background:#c6a77b;border:0;cursor:pointer;";
+
+        retry.addEventListener("click", loadPhotos);
+
+        message.append(heading, detail, help, retry);
+
+        gallery.appendChild(message);
 
     }
 
